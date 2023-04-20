@@ -6,12 +6,11 @@
 // The program should wait until all the spawned threads have finished and
 // should collect their return values into a vector.
 
-// I AM NOT DONE
-
+use std::any::Any;
 use std::thread;
 use std::time::{Duration, Instant};
 
-fn main() {
+fn main() -> Result<(), Box<dyn Any + Send>> {
     let mut handles = vec![];
     for i in 0..10 {
         handles.push(thread::spawn(move || {
@@ -24,7 +23,8 @@ fn main() {
 
     let mut results: Vec<u128> = vec![];
     for handle in handles {
-        // TODO: a struct is returned from thread::spawn, can you use it?
+        let result = handle.join()?;
+        results.push(result);
     }
 
     if results.len() != 10 {
@@ -35,4 +35,6 @@ fn main() {
     for (i, result) in results.into_iter().enumerate() {
         println!("thread {} took {}ms", i, result);
     }
+
+    Ok(())
 }
